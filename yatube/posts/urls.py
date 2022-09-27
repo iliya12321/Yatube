@@ -15,10 +15,10 @@ urlpatterns = [
     path('posts/<int:post_id>/', views.post_detail, name='post_detail'),
     path('create/', views.post_create, name='post_create'),
     path('', views.index, name='index'),
-    path('follow/', views.follow_index, name='follow_index'),    
+    path('follow/', views.follow_index, name='follow_index'),
     path(
         'profile/<str:username>/follow/',
-        views.profile_follow, 
+        views.profile_follow,
         name='profile_follow'
     ),
     path(

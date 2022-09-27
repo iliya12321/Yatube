@@ -105,11 +105,14 @@ class PostViewsTest(TestCase):
         """Проверка кеша страницы index"""
         response = self.authorized_client.get(reverse('posts:index'))
         self.post.delete()
-        response_after_delete = self.authorized_client.get(reverse('posts:index'))
+        response_after_delete = self.authorized_client.get(
+            reverse('posts:index'))
         self.assertEqual(response_after_delete.content, response.content)
         cache.clear()
-        response_after_clear_cache = self.authorized_client.get(reverse('posts:index'))
-        self.assertNotEqual(response_after_clear_cache.content, response.content)
+        response_after_clear_cache = self.authorized_client.get(
+            reverse('posts:index'))
+        self.assertNotEqual(
+            response_after_clear_cache.content, response.content)
 
     def test_index_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом"""
@@ -182,5 +185,6 @@ class PostViewsTest(TestCase):
         for postfixurl, posts in postfixurl_posts:
             for page in PostViewsTest.pages_with_paginator:
                 with self.subTest(page=page):
-                    response = self.authorized_client.get(page, {'page': postfixurl})
+                    response = self.authorized_client.get(
+                        page, {'page': postfixurl})
                     self.assertEqual(len(response.context['page_obj']), posts)

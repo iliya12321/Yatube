@@ -6,7 +6,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 
-from posts.models import Group, Post, User, Comment
+from posts.models import Group, Post, User, Comment, Follow
 from posts.forms import PostForm, CommentForm
 
 
@@ -150,3 +150,84 @@ class PostFormTests(TestCase):
             ).exists()
         )
         self.assertRedirects(response, '/auth/login/?next=/create/')
+
+
+class FollowTests(TestCase):
+    def setUp(self):
+        self.guest_client = Client()
+        self.client_auth_follower = Client()
+        self.client_auth_following = Client()
+        self.user_follower = User.objects.create_user(username='follower')
+        self.user_following = User.objects.create_user(username='following')
+        self.post = Post.objects.create(
+            author=self.user_following,
+            text='Тестовая запись'
+        )
+        self.client_auth_follower.force_login(self.user_follower)
+        self.client_auth_following.force_login(self.user_following)
+    def test_follow(self):
+        self.client_auth_follower.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={
+                    'username':
+                    self.user_following.username
+                }
+            )
+        )
+        self.assertEqual(Follow.objects.all().count(), 1)
+    def test_unfollow(self):
+        self.client_auth_follower.get(
+            reverse(
+                'posts:profile_follow',
+                kwargs={
+                    'username':
+                    self.user_following.username
+                }
+            )
+        )
+        self.client_auth_follower.get(
+            reverse(
+                'posts:profile_unfollow',
+                kwargs={
+                    'username':
+                    self.user_following.username
+                }
+            )
+        )
+        self.assertEqual(Follow.objects.all().count(), 0)
+    def test_subscription_feed(self):
+        """запись появляется в ленте подписчиков"""
+        Follow.objects.create(
+            user=self.user_follower,
+            author=self.user_following
+        )
+        response = self.client_auth_follower.get('/follow/')
+        post_text_0 = response.context["page_obj"][0].text
+        self.assertEqual(
+            post_text_0,
+            'Тестовая запись'
+        )
+        response = self.client_auth_following.get('/follow/')
+        self.assertNotContains(
+            response,
+            'Тестовая запись'
+        )
+        address_redirect = [
+            (
+                reverse(
+                    'posts:profile_follow',
+                    kwargs={
+                        'username': {
+                            'username': self.user_following.username
+                        }
+                    }
+                ),
+                f'/auth/login/?next=/profile/%257B%27username%27%3A%2520%27'
+                f'{self.user_following.username}%27%257D/follow/'
+            ),
+        ]
+        for adress, temlate in address_redirect:
+            with self.subTest():
+                response = self.guest_client.get(adress)
+                self.assertRedirects(response, temlate)

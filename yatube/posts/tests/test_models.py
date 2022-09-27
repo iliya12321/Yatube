@@ -49,14 +49,18 @@ class PostModelTest(TestCase):
             (post._meta.get_field('image').verbose_name, 'Картинка'),
             (group._meta.get_field('title').verbose_name, 'Имя группы'),
             (group._meta.get_field('description').verbose_name, 'Описание'),
-            (comment._meta.get_field('post').verbose_name, 'Пост к которому оставлен комментарий'),
-            (comment._meta.get_field('author').verbose_name, 'Автор комментария'),
+            (comment._meta.get_field('post').verbose_name,
+                'Пост к которому оставлен комментарий'),
+            (comment._meta.get_field('author').verbose_name,
+                'Автор комментария'),
             (comment._meta.get_field('text').verbose_name, 'Комментарий'),
-            (comment._meta.get_field('created').verbose_name, 'Дата публикации'),
+            (comment._meta.get_field('created').verbose_name,
+                'Дата публикации'),
             (post._meta.get_field('text').help_text, 'Введите текст поста'),
             (post._meta.get_field('group').help_text,
                 'Группа, к которой будет относиться пост'),
-            (comment._meta.get_field('text').help_text, 'Напишите комментарий'),
+            (comment._meta.get_field('text').help_text,
+                'Напишите комментарий'),
             (post._meta.get_field('image').help_text, 'Загрузите картинку')
         ]
         for func_result, expected_value in func_expect_value:
