@@ -165,6 +165,7 @@ class FollowTests(TestCase):
         )
         self.client_auth_follower.force_login(self.user_follower)
         self.client_auth_following.force_login(self.user_following)
+
     def test_follow(self):
         self.client_auth_follower.get(
             reverse(
@@ -176,6 +177,7 @@ class FollowTests(TestCase):
             )
         )
         self.assertEqual(Follow.objects.all().count(), 1)
+
     def test_unfollow(self):
         self.client_auth_follower.get(
             reverse(
@@ -196,6 +198,7 @@ class FollowTests(TestCase):
             )
         )
         self.assertEqual(Follow.objects.all().count(), 0)
+
     def test_subscription_feed(self):
         """запись появляется в ленте подписчиков"""
         Follow.objects.create(
