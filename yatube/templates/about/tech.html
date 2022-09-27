@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Технологии{% endblock %}
+{% block content %}
+{% load static %}
+<div class="row">
+  <h1>Вот что я умею</h1>
+  <aside class="col-12 col-md-3">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        Python
+      </li>
+      <li class="list-group-item">
+        Django
+      </li>
+      <li class="list-group-item">
+        SQL
+      </li>
+    </ul>
+  </aside>
+  <article class="col-12 col-md-9">
+    <h1>Текст страницы "Технологии"</h1>
+    <p>Навыки, блягодаря которым я справился с этим проектом</p>
+    <ol>
+      <li>Целеустремлённость</li>
+      <li>Не сдаваться, как бы не было сложно</li>
+      <li>Усидчивость</li>
+      <li>Любовь к программированию</li>
+    </ol>
+    <p>Сложности</p>
+    <ul>
+      <li>Тестирование views-функций и их создание</li>
+    </ul>
+    <p>Разбираюсь в:</p>
+    <ul>
+      <li>html-шаблонах</li>
+      <li>forms</li>
+      <li>models</li>
+      <li>urls</li>
+      <li>Тестирование: urls, models, forms</li>
+      <li>Вывод переменных в шаблоны</li>
+    </ul>
+    <a class="navbar-brand">
+      <img src="{% static 'img/cats.png' %}" width="300" height="300" class="d-inline-block align-top" alt="Что-то сломалось">
+    </a>
+  </article>
+</div>
+{% endblock %}

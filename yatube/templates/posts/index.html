@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}Главная страница{% endblock %}
+{% block content %}
+{% load thumbnail %}
+{% load cache %}
+{% cache 20 index_page %}
+         <h1>{% block header %}Главная страница <span style="color:red">Ya</span>tube</p>{% endblock %}</h1>
+         {% include 'posts/includes/swither.html' %}
+         {% for post in page_obj %}
+          {% include 'includes/article.html' with all_users_posts_link=True all_group_records_link=True detailed_info_link=True %}
+         {% endfor %}
+         {% include 'posts/includes/paginator.html' %}
+{% endcache %}
+{% endblock %}
