@@ -12,7 +12,7 @@
       {% if post.group %}
             <li class="list-group-item">
               Группа: {{ post.group }}
-              <a class="btn btn-success" href="{% url 'posts:group_list' post.group.slug %}">
+              <a class="btn btn-primary" href="{% url 'posts:group_list' post.group.slug %}">
                 все записи группы
               </a>
       {% endif %}
@@ -21,10 +21,10 @@
               Автор: {{ post.author }}
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
-              Всего постов автора: {{ post_count }} <p><span style="color:red">Ya</span>tube</p>
+              Всего постов автора: {{ post.author.posts.count }} <p><span style="color:red">Ya</span>tube</p>
             </li>
             <li class="list-group-item">
-              <a class="btn btn-success" href="{% url 'posts:profile' post.author %}">
+              <a class="btn btn-primary" href="{% url 'posts:profile' post.author %}">
                 все посты пользователя
               </a>
             </li>
@@ -36,7 +36,7 @@
           {% endthumbnail %}
           <p>{{ post.text }} </p>
           {% if user == post.author %}
-          <a class="btn btn-success" href="{% url 'posts:post_edit' post.pk %}">
+          <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}">
             редактировать запись
           </a>
           {% else %}
@@ -60,7 +60,7 @@
           </div>
         {% endif %}
 
-        {% for comment in comments %}
+        {% for comment in post.comments.all %}
           <div class="media mb-4">
             <div class="media-body">
               <h5 class="mt-0">

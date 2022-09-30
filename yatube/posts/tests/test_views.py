@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.urls import reverse
 from django import forms
 
-from posts.models import Post, Group, User
+from posts.models import Comment, Group, Follow, Post, User
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -19,6 +19,7 @@ class PostViewsTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.follower_user = User.objects.create(username='test_follower')
         cls.author = User.objects.create_user(username='test_user')
         cls.group = Group.objects.create(
             slug='test_slug',
@@ -43,6 +44,11 @@ class PostViewsTest(TestCase):
             author=cls.author,
             group=cls.group,
             image=cls.uploaded
+        )
+        cls.comment = Comment.objects.create(
+            text='Коммент',
+            author=cls.author,
+            post=cls.post
         )
         cls.index_page = reverse('posts:index')
         cls.group_list_page = reverse(
@@ -81,6 +87,8 @@ class PostViewsTest(TestCase):
         cache.clear()
         self.authorized_client = Client()
         self.authorized_client.force_login(PostViewsTest.author)
+        self.follower_client = Client()
+        self.follower_client.force_login(PostViewsTest.follower_user)
 
     def asserts(self, first_object):
         self.assertEqual(first_object.author, PostViewsTest.post.author)
@@ -106,13 +114,16 @@ class PostViewsTest(TestCase):
         response = self.authorized_client.get(reverse('posts:index'))
         self.post.delete()
         response_after_delete = self.authorized_client.get(
-            reverse('posts:index'))
+            reverse('posts:index')
+        )
         self.assertEqual(response_after_delete.content, response.content)
         cache.clear()
         response_after_clear_cache = self.authorized_client.get(
-            reverse('posts:index'))
+            reverse('posts:index')
+        )
         self.assertNotEqual(
-            response_after_clear_cache.content, response.content)
+            response_after_clear_cache.content, response.content
+        )
 
     def test_index_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом"""
@@ -135,7 +146,8 @@ class PostViewsTest(TestCase):
         self.asserts(first_object)
         self.assertEqual(len(response.context['page_obj'].object_list), 1)
         self.assertEqual(
-            response.context['title'], f'Профайл пользователя {self.author}')
+            response.context['title'], f'Профайл пользователя {self.author}'
+        )
 
     def test_post_detail_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом"""
@@ -172,6 +184,43 @@ class PostViewsTest(TestCase):
                 self.assertIsInstance(form_field, expected)
         self.assertTrue(response.context['is_edit'])
         self.asserts(first_object)
+
+    def test_authorized_user_can_follow(self):
+        """Авторизованный пользователь может подписаться на автора
+        и отписаться."""
+        self.follower_client.get(reverse(
+            'posts:profile_follow',
+            kwargs={'username': PostViewsTest.author.username})
+        )
+        follow_count = Follow.objects.all().count()
+        self.assertEqual(follow_count, 1)
+        self.follower_client.get(reverse(
+            'posts:profile_unfollow',
+            kwargs={'username': PostViewsTest.author.username})
+        )
+        unfollow_count = Follow.objects.all().count()
+        self.assertEqual(unfollow_count, 0)
+
+    def test_new_post_appears_in_the_subscribers(self):
+        """Новый пост появляется у подписчиков автора поста
+        и отсутвует у тех кто не подписан на автора."""
+        self.new_post = Post.objects.create(
+            group=PostViewsTest.group,
+            author=PostViewsTest.author,
+            text='Написал новый пост'
+        )
+        Follow.objects.create(
+            user=PostViewsTest.follower_user,
+            author=PostViewsTest.author
+        )
+        response = self.follower_client.get(reverse('posts:follow_index'))
+        self.assertEqual(
+            len(response.context['page_obj'].object_list), 2
+        )
+        response = self.authorized_client.get(reverse('posts:follow_index'))
+        self.assertNotContains(
+            response, self.new_post.text
+        )
 
     def test_page_paginator(self):
         """Проверка Пагинатора"""

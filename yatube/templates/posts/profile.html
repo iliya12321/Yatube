@@ -4,7 +4,9 @@
 {% load thumbnail %}
     <div class="mb-5">
       <h1>Все посты пользователя {{ author }} </h1>
-      <h3>Всего постов: {{ post_count}} </h3>
+      <h3>Всего постов: {{ author.posts.count }} </h3>
+      <h3>Количество подписчиков: {{ author.following.count }}</h3>
+      <h3>Количество подписок: {{ user.follower.count }}</h3>
       {% if user != author %}
         {% if following %}
           <a

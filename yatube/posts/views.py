@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.cache import cache_page
 
-from .utils import get_page_paginator
-from .models import Post, Group, User, Follow
-from .forms import PostForm, CommentForm
+from posts.utils import get_page_paginator
+from posts.models import Group, Follow, Post, User
+from posts.forms import CommentForm, PostForm
 
 
 WORD_LIMIT = 30  # Количество выводимых букв в заголовке профайла
@@ -15,16 +15,13 @@ def index(request):
     """Главная страница"""
     posts = Post.objects.select_related('group', 'author')
     page_obj = get_page_paginator(posts, request)
-    context = {
-        'page_obj': page_obj
-    }
-    return render(request, 'posts/index.html', context)
+    return render(request, 'posts/index.html', {'page_obj': page_obj})
 
 
 def group_posts(request, slug):
     """Все посты выбранной группы"""
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.all()
+    posts = group.posts.select_related('group',)
     page_obj = get_page_paginator(posts, request)
     context = {
         'group': group,
@@ -36,8 +33,7 @@ def group_posts(request, slug):
 def profile(request, username):
     """Профайл автора"""
     author = get_object_or_404(User, username=username)
-    posts = author.posts.all()
-    post_count = author.posts.all().count()
+    posts = author.posts.select_related('author',)
     title = f'Профайл пользователя {author}'
     if request.user.is_authenticated:
         following = Follow.objects.filter(
@@ -49,7 +45,6 @@ def profile(request, username):
     context = {
         'following': following,
         'author': author,
-        'post_count': post_count,
         'title': title,
         'page_obj': page_obj
     }
@@ -59,8 +54,6 @@ def profile(request, username):
 def post_detail(request, post_id):
     """Подробная информация выбранного поста"""
     post = get_object_or_404(Post, pk=post_id)
-    post_count = post.author.posts.count()
-    comments = post.comments.all()
     form = CommentForm(request.POST or None)
 
     if form.is_valid():
@@ -72,8 +65,6 @@ def post_detail(request, post_id):
     title = f'Пост {post.text[:WORD_LIMIT]}'
     context = {
         'form': form,
-        'comments': comments,
-        'post_count': post_count,
         'post': post,
         'title': title
     }
@@ -117,8 +108,7 @@ def post_edit(request, post_id):
     context = {
         'form': form,
         'post': post,
-        'is_edit': is_edit,
-        'post_id': post.pk
+        'is_edit': is_edit
     }
     return render(request, 'posts/create_post.html', context)
 
@@ -143,19 +133,16 @@ def follow_index(request):
         author__following__user=request.user
     ).select_related('author', 'group')
     page_obj = get_page_paginator(posts, request)
-    context = {
-        'page_obj': page_obj
-    }
-    return render(request, 'posts/follow.html', context)
+    return render(request, 'posts/follow.html', {'page_obj': page_obj})
 
 
 @login_required
 def profile_follow(request, username):
-    user = request.user
-    author = User.objects.get(username=username)
-    follower = Follow.objects.filter(user=user, author=author)
-    if user != author and not follower.exists():
-        Follow.objects.create(user=user, author=author)
+    if request.user != get_object_or_404(User, username=username):
+        Follow.objects.get_or_create(
+            user=request.user,
+            author=User.objects.get(username=username)
+        )
     return redirect('posts:profile', username=username)
 
 

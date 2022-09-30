@@ -8,7 +8,7 @@
       </a>
       <ul class="nav nav-pills">
         {% with request.resolver_match.view_name as view_name %}
-        <li class="nav-item"> 
+        <li class="nav-item">
           <a class="nav-link {% if view_name  == 'about:author' %}active{% endif %}"
             href="{% url 'about:author' %}">Об авторе</a>
         </li>
