@@ -7,7 +7,6 @@ from django.test import TestCase, Client, override_settings
 from django.urls import reverse
 
 from posts.models import Group, Post, User, Comment, Follow
-from posts.forms import PostForm, CommentForm
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
@@ -24,8 +23,6 @@ class PostFormTests(TestCase):
             slug='test-slug',
             description='Тестовое описание',
         )
-        cls.form_comment = CommentForm()
-        cls.form = PostForm()
 
     @classmethod
     def tearDownClass(cls):

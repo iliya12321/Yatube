@@ -45,11 +45,6 @@ class PostViewsTest(TestCase):
             group=cls.group,
             image=cls.uploaded
         )
-        cls.comment = Comment.objects.create(
-            text='Коммент',
-            author=cls.author,
-            post=cls.post
-        )
         cls.index_page = reverse('posts:index')
         cls.group_list_page = reverse(
             'posts:group_list', kwargs={'slug': 'test_slug'}
@@ -95,7 +90,8 @@ class PostViewsTest(TestCase):
         self.assertEqual(first_object.text, PostViewsTest.post.text)
         self.assertEqual(first_object.group, PostViewsTest.post.group)
         self.assertEqual(
-            first_object.group.slug, PostViewsTest.post.group.slug)
+            first_object.group.slug, PostViewsTest.post.group.slug
+        )
         self.assertEqual(
             first_object.group.description,
             PostViewsTest.post.group.description
@@ -235,5 +231,6 @@ class PostViewsTest(TestCase):
             for page in PostViewsTest.pages_with_paginator:
                 with self.subTest(page=page):
                     response = self.authorized_client.get(
-                        page, {'page': postfixurl})
+                        page, {'page': postfixurl}
+                    )
                     self.assertEqual(len(response.context['page_obj']), posts)

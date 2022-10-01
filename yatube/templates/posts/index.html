@@ -4,7 +4,7 @@
 {% load thumbnail %}
 {% load cache %}
 {% cache 20 index_page %}
-         {% include 'posts/includes/swither.html' %}
+         {% include 'posts/includes/swither.html' with index=True %}
             <h1>{% block header %}Главная страница <span style="color:red">Ya</span><span style="color:black">tube</span></p>{% endblock %}</h1>
          {% for post in page_obj %}
           {% include 'includes/article.html' with all_users_posts_link=True all_group_records_link=True detailed_info_link=True %}

@@ -35,12 +35,12 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = author.posts.select_related('author',)
     title = f'Профайл пользователя {author}'
-    if request.user.is_authenticated:
-        following = Follow.objects.filter(
-            user=request.user, author=author
+    following = (
+        request.user.is_authenticated
+        and Follow.objects.filter(
+        user=request.user, author=author
         ).exists()
-    else:
-        following = False
+    )
     page_obj = get_page_paginator(posts, request)
     context = {
         'following': following,

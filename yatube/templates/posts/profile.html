@@ -6,18 +6,18 @@
       <h1>Все посты пользователя {{ author }} </h1>
       <h3>Всего постов: {{ author.posts.count }} </h3>
       <h3>Количество подписчиков: {{ author.following.count }}</h3>
-      <h3>Количество подписок: {{ user.follower.count }}</h3>
-      {% if user != author %}
+      <h3>Количество подписок: {{ request.user.follower.count }}</h3>
+      {% if user != author and user.is_authenticated %}
         {% if following %}
           <a
-            class="btn btn-lg btn-light"
+            class="btn btn-secondary"
             href="{% url 'posts:profile_unfollow' author.username %}" role="button"
           >
             Отписаться
           </a>
         {% else %}
             <a
-              class="btn btn-lg btn-primary"
+              class="btn btn-danger"
               href="{% url 'posts:profile_follow' author.username %}" role="button"
             >
               Подписаться
