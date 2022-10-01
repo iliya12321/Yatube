@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.urls import reverse
 from django import forms
 
-from posts.models import Comment, Group, Follow, Post, User
+from posts.models import Group, Follow, Post, User
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
