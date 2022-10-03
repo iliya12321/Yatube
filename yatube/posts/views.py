@@ -53,13 +53,6 @@ def post_detail(request, post_id):
     """Подробная информация выбранного поста"""
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
-
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.post = post
-        comment.save()
-        return redirect('posts:post_detail', post_id=post_id)
-
     title = f'Пост {post.text[:WORD_LIMIT]}'
     context = {
         'form': form,

@@ -2,12 +2,12 @@
 {% block title %}{{ group }}{% endblock %}
 {% block content %}
 {% load thumbnail %}
-        <h1>{% block header %}{{ group }}{% endblock %}</h1>
-        <p>
-          {{ group.description}}
-        </p>
-        {% for post in page_obj %}
-        {% include 'includes/article.html' with all_users_posts_link=True detailed_info_link=True%} 
-        {% endfor %}
-        {% include 'posts/includes/paginator.html' %}
+  <h1>{% block header %}{{ group }}{% endblock %}</h1>
+  <p>
+    {{ group.description}}
+  </p>
+  {% for post in page_obj %}
+    {% include 'includes/article.html' with all_users_posts_link=True detailed_info_link=True%}
+  {% endfor %}
+  {% include 'posts/includes/paginator.html' %}
 {% endblock %}

@@ -2,10 +2,10 @@
 {% block title %}Главная страница{% endblock %}
 {% block content %}
 {% load thumbnail %}
-         <h1>Подписки</h1>
-         {% include 'posts/includes/swither.html' with follow=True %}
-         {% for post in page_obj %}
-          {% include 'includes/article.html' with all_users_posts_link=True all_group_records_link=True detailed_info_link=True %}
-         {% endfor %}
-         {% include 'posts/includes/paginator.html' %}
+    <h1>Подписки</h1>
+    {% include 'posts/includes/swither.html' with follow=True %}
+    {% for post in page_obj %}
+     {% include 'includes/article.html' with all_users_posts_link=True all_group_records_link=True detailed_info_link=True %}
+    {% endfor %}
+    {% include 'posts/includes/paginator.html' %}
 {% endblock %}

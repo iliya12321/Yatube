@@ -2,31 +2,31 @@
 {% block title %} Профайл пользователя {{ author }}{% endblock %}
 {% block content %}
 {% load thumbnail %}
-    <div class="mb-5">
-      <h1>Все посты пользователя {{ author }} </h1>
-      <h3>Всего постов: {{ author.posts.count }} </h3>
-      <h3>Количество подписчиков: {{ author.following.count }}</h3>
-      <h3>Количество подписок: {{ user.follower.count }}</h3>
-      {% if user != author and user.is_authenticated %}
-        {% if following %}
+  <div class="mb-5">
+    <h1>Все посты пользователя {{ author }} </h1>
+    <h3>Всего постов: {{ author.posts.count }} </h3>
+    <h3>Количество подписчиков: {{ author.following.count }}</h3>
+    <h3>Количество подписок: {{ user.follower.count }}</h3>
+    {% if user != author and user.is_authenticated %}
+      {% if following %}
+        <a
+          class="btn btn-secondary"
+          href="{% url 'posts:profile_unfollow' author.username %}" role="button"
+        >
+          Отписаться
+        </a>
+      {% else %}
           <a
-            class="btn btn-secondary"
-            href="{% url 'posts:profile_unfollow' author.username %}" role="button"
+            class="btn btn-danger"
+            href="{% url 'posts:profile_follow' author.username %}" role="button"
           >
-            Отписаться
+            Подписаться
           </a>
-        {% else %}
-            <a
-              class="btn btn-danger"
-              href="{% url 'posts:profile_follow' author.username %}" role="button"
-            >
-              Подписаться
-            </a>
-        {% endif %}
       {% endif %}
-        {% for post in page_obj %}
-         {% include "includes/article.html" with detailed_info_link=True all_group_records_link=True %}
-        {% endfor %}
-      {% include 'posts/includes/paginator.html' %}
-    </div>
+    {% endif %}
+      {% for post in page_obj %}
+       {% include "includes/article.html" with detailed_info_link=True all_group_records_link=True %}
+      {% endfor %}
+    {% include 'posts/includes/paginator.html' %}
+  </div>
 {% endblock %}
