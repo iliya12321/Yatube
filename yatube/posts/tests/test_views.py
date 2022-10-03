@@ -8,10 +8,18 @@ from django.core.cache import cache
 from django.urls import reverse
 from django import forms
 
-from posts.models import Group, Follow, Post, User
+from posts.models import Comment, Group, Follow, Post, User
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
+small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )  # изображение
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -26,17 +34,9 @@ class PostViewsTest(TestCase):
             title='test_title',
             description='test_description'
         )
-        cls.small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x02\x00'
-            b'\x01\x00\x80\x00\x00\x00\x00\x00'
-            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
-            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
-            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
-            b'\x0A\x00\x3B'
-        )
         cls.uploaded = SimpleUploadedFile(
             name='small.gif',
-            content=cls.small_gif,
+            content=small_gif,
             content_type='image/gif'
         )
         cls.post = Post.objects.create(
@@ -44,6 +44,11 @@ class PostViewsTest(TestCase):
             author=cls.author,
             group=cls.group,
             image=cls.uploaded
+        )
+        cls.comment = Comment.objects.create(
+            text='Коммент',
+            author=cls.author,
+            post=cls.post
         )
         cls.index_page = reverse('posts:index')
         cls.group_list_page = reverse(
@@ -141,16 +146,23 @@ class PostViewsTest(TestCase):
         first_object = response.context.get('post')
         self.asserts(first_object)
         self.assertEqual(len(response.context['page_obj'].object_list), 1)
-        self.assertEqual(
-            response.context['title'], f'Профайл пользователя {self.author}'
-        )
 
     def test_post_detail_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом"""
         response = self.authorized_client.get(PostViewsTest.post_detail_page)
         first_object = response.context.get('post')
         self.asserts(first_object)
+        # self.assertEqual(
+        #     response.context['post'].comments, PostViewsTest.post.comments
+        # )
         self.assertEqual(response.context['title'], f'Пост {self.post.text}')
+        form_fields = {
+            'text': forms.fields.CharField
+        }
+        for value, expected in form_fields.items():
+            with self.subTest(value=value):
+                form_field = response.context['form'].fields[value]
+                self.assertIsInstance(form_field, expected)
 
     def test_post_create_show_correct_context(self):
         """Шаблон create_post сформирован с правильным контекстом"""

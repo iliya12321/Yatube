@@ -1,12 +1,15 @@
 from django.test import TestCase
 
-from posts.models import Group, Post, User, Comment
+from posts.models import Comment, Group, Follow, Post, User
 
 
 class PostModelTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+        cls.follower_user = User.objects.create_user(
+            username='Подписчик'
+        )
         cls.user = User.objects.create_user(username='auth')
         cls.group = Group.objects.create(
             title='А' * 200,
@@ -22,6 +25,10 @@ class PostModelTest(TestCase):
             text='Текст поста',
             author=cls.user,
             post=cls.post
+        )
+        cls.follow = Follow.objects.create(
+            author=cls.user,
+            user=cls.follower_user
         )
 
     def test_models_have_correct_object_names(self):
@@ -40,35 +47,57 @@ class PostModelTest(TestCase):
         post = PostModelTest.post
         group = PostModelTest.group
         comment = PostModelTest.comment
-        func_expect_value = [
-            (post._meta.get_field('text').verbose_name, 'Текст поста'),
-            (post._meta.get_field('pub_date').verbose_name,
-                'Дата публикации'),
-            (post._meta.get_field('author').verbose_name, 'Автор'),
-            (post._meta.get_field('group').verbose_name, 'Группа'),
-            (post._meta.get_field('image').verbose_name, 'Картинка'),
-            (group._meta.get_field('title').verbose_name, 'Имя группы'),
-            (group._meta.get_field('description').verbose_name, 'Описание'),
-            (comment._meta.get_field('post').verbose_name,
-                'Пост к которому оставлен комментарий'),
-            (comment._meta.get_field('author').verbose_name,
-                'Автор комментария'),
-            (comment._meta.get_field('text').verbose_name, 'Комментарий'),
-            (comment._meta.get_field('created').verbose_name,
-                'Дата публикации'),
-            (post._meta.get_field('text').help_text, 'Введите текст поста'),
-            (post._meta.get_field('group').help_text,
-                'Группа, к которой будет относиться пост'),
-            (comment._meta.get_field('text').help_text,
-                'Напишите комментарий'),
-            (post._meta.get_field('image').help_text, 'Загрузите картинку')
+        follow = PostModelTest.follow
+        func_expect_value_verb_name = [
+            (post, [
+                ('text', 'Текст поста'),
+                ('pub_date', 'Дата публикации'),
+                ('author', 'Автор'),
+                ('group', 'Группа'),
+                ('image', 'Картинка')
+            ]),
+            (group, [
+                ('title', 'Имя группы'),
+                ('description', 'Описание')
+            ]),
+            (comment, [
+                ('text', 'Комментарий'),
+                ('created', 'Дата публикации'),
+                ('author', 'Автор комментария'),
+                ('post', 'Пост')
+            ]),
+            (follow, [
+                ('author', 'Автор'),
+                ('user', 'Подписчик')
+            ])
         ]
-        for func_result, expected_value in func_expect_value:
-            with self.subTest(
-                func_result=func_result,
-                expected_value=expected_value
-            ):
-                self.assertEqual(func_result, expected_value)
+        for model, part_model in func_expect_value_verb_name:
+            for key, expected_value in part_model:
+                with self.subTest(
+                    key=key,
+                    expected_value=expected_value
+                ):
+                    func_result = model._meta.get_field(key).verbose_name
+                    self.assertEqual(func_result, expected_value)
+        func_expect_value_help_text = [
+            (post, [
+                ('text', 'Введите текст поста'),
+                ('group', 'Группа, к которой будет относиться пост'),
+                ('image', 'Загрузите картинку')
+            ]),
+            (comment, [
+                ('text', 'Напишите комментарий'),
+                ('post', 'Пост к которому оставлен комментарий')
+            ])
+        ]
+        for model, part_model in func_expect_value_help_text:
+            for key, expected_value in part_model:
+                with self.subTest(
+                    key=key,
+                    expected_value=expected_value
+                ):
+                    func_result = model._meta.get_field(key).help_text
+                    self.assertEqual(func_result, expected_value)
 
     def test_text_slug_max_length_not_exceed(self):
         """

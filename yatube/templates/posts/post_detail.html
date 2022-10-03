@@ -36,9 +36,11 @@
           {% endthumbnail %}
           <p>{{ post.text }} </p>
           {% if user == post.author %}
-          <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}">
-            редактировать запись
-          </a>
+          <div class="d-flex justify-content-start">
+            <a class="btn btn-primary" href="{% url 'posts:post_edit' post.pk %}">
+              редактировать запись
+            </a>
+          </div>
           {% else %}
           {% endif %}
         </article>

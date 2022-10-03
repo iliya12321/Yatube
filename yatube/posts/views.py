@@ -34,7 +34,6 @@ def profile(request, username):
     """Профайл автора"""
     author = get_object_or_404(User, username=username)
     posts = author.posts.select_related('author',)
-    title = f'Профайл пользователя {author}'
     following = (
         request.user.is_authenticated
         and Follow.objects.filter(
@@ -45,7 +44,6 @@ def profile(request, username):
     context = {
         'following': following,
         'author': author,
-        'title': title,
         'page_obj': page_obj
     }
     return render(request, 'posts/profile.html', context)
