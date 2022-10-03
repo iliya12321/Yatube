@@ -156,6 +156,7 @@ class PostViewsTest(TestCase):
             response.context['post'].comments.all()[0],
             self.post.comments.all()[0]
         )
+        self.assertEqual(len(self.post.comments.all()), 1)
         self.assertEqual(response.context['title'], f'Пост {self.post.text}')
         form_fields = {
             'text': forms.fields.CharField
