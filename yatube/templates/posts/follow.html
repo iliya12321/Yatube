@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Главная страница{% endblock %}
 {% block content %}
-{% load thumbnail %}
     <h1>Подписки</h1>
     {% include 'posts/includes/swither.html' with follow=True %}
     {% for post in page_obj %}
