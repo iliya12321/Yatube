@@ -26,7 +26,7 @@ git clone <HTTPS or SSH>
 ```
 
 ```
-cd hw05_final
+cd Yatube
 ```
 
 2. Установите и активируйте виртуальное окружение
