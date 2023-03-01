@@ -10,7 +10,7 @@ from posts.forms import CommentForm, PostForm
 WORD_LIMIT = 30  # Количество выводимых букв в заголовке профайла
 
 
-@cache_page(60 * 20)
+@cache_page(20 * 1, key_prefix='index_page')
 def index(request):
     """Главная страница"""
     posts = Post.objects.select_related('group', 'author')
@@ -25,7 +25,7 @@ def group_posts(request, slug):
     page_obj = get_page_paginator(posts, request)
     context = {
         'group': group,
-        'page_obj': page_obj
+        'page_obj': page_obj,
     }
     return render(request, 'posts/group_list.html', context)
 
@@ -44,7 +44,7 @@ def profile(request, username):
     context = {
         'following': following,
         'author': author,
-        'page_obj': page_obj
+        'page_obj': page_obj,
     }
     return render(request, 'posts/profile.html', context)
 
@@ -64,7 +64,7 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
-    """Cтраницa создания новой записи."""
+    """Создание новой записи"""
     form = PostForm(
         request.POST or None,
         files=request.FILES or None
@@ -79,7 +79,7 @@ def post_create(request):
 
 
 def post_edit(request, post_id):
-    """Страница изменения выбранного поста"""
+    """Изменение выбранного поста"""
     post = get_object_or_404(Post, pk=post_id)
 
     if request.user != post.author:
@@ -106,7 +106,7 @@ def post_edit(request, post_id):
 
 @login_required
 def add_comment(request, post_id):
-    """Страница добавления комментов"""
+    """Добавление комментов"""
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST or None)
 
@@ -120,6 +120,7 @@ def add_comment(request, post_id):
 
 @login_required
 def follow_index(request):
+    """Все подписки"""
     posts = Post.objects.filter(
         author__following__user=request.user
     ).select_related('author', 'group')
@@ -129,6 +130,7 @@ def follow_index(request):
 
 @login_required
 def profile_follow(request, username):
+    """Подписать на автора"""
     if request.user != get_object_or_404(User, username=username):
         Follow.objects.get_or_create(
             user=request.user,
@@ -139,6 +141,7 @@ def profile_follow(request, username):
 
 @login_required
 def profile_unfollow(request, username):
+    """Отписаться от автора"""
     author = get_object_or_404(User, username=username)
     follower = Follow.objects.filter(user=request.user, author=author)
     if follower.exists():

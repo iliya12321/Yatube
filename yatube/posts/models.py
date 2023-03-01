@@ -22,18 +22,18 @@ class Group(models.Model):
 class Post(models.Model):
     text = models.TextField(
         'Текст поста',
-        help_text='Введите текст поста'
+        help_text='Введите текст поста',
     )
     pub_date = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='posts',
-        verbose_name='Автор'
+        verbose_name='Автор',
     )
     group = models.ForeignKey(
         Group,
@@ -42,13 +42,13 @@ class Post(models.Model):
         blank=True,
         null=True,
         verbose_name='Группа',
-        help_text='Группа, к которой будет относиться пост'
+        help_text='Группа, к которой будет относиться пост',
     )
     image = models.ImageField(
         'Картинка',
         upload_to='posts/',
         blank=True,
-        help_text='Загрузите картинку'
+        help_text='Загрузите картинку',
     )
 
     def __str__(self):
@@ -66,7 +66,7 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Пост',
-        help_text='Пост к которому оставлен комментарий'
+        help_text='Пост к которому оставлен комментарий',
     )
     author = models.ForeignKey(
         User,
@@ -76,12 +76,12 @@ class Comment(models.Model):
     )
     text = models.TextField(
         'Комментарий',
-        help_text='Напишите комментарий'
+        help_text='Напишите комментарий',
     )
     created = models.DateTimeField(
         'Дата публикации',
         auto_now_add=True,
-        db_index=True
+        db_index=True,
     )
 
     def __str__(self):
@@ -98,13 +98,13 @@ class Follow(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='follower',
-        verbose_name='Подписчик'
+        verbose_name='Подписчик',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         verbose_name='Автор',
-        related_name='following'
+        related_name='following',
     )
 
     def __str__(self):
@@ -116,6 +116,6 @@ class Follow(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'author'],
-                name='unique_follow'
-            )
+                name='unique_follow',
+            ),
         ]

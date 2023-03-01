@@ -19,7 +19,7 @@
 1. Клонируйте репозиторий и перейдите в него в командной строке:
 
 ```
-git clone https://github.com/evencatt/hw05_final.git
+git clone <HTTPS or SSH>
 ```
 
 ```

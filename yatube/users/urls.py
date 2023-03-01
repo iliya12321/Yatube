@@ -7,11 +7,13 @@ from django.contrib.auth.views import (
     PasswordResetView,
     PasswordResetDoneView,
     PasswordResetConfirmView,
-    PasswordResetCompleteView
+    PasswordResetCompleteView,
 )
 from django.urls import path
 
+
 app_name = 'users'
+
 
 urlpatterns = [
     path('signup/', views.SignUp.as_view(), name='signup'),
